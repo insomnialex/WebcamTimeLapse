@@ -1,0 +1,4 @@
+Alex Quintero 2012
+
+Simple application that connects to a local webcam and saves images to the selected folder on an interval selected by the user.
+Right now it just counts the number of frames, but i'll change it to use a timer instead.
