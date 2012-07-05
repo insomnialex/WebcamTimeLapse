@@ -16,9 +16,11 @@ namespace WindowsFormsApplication1
     {
         private VideoCaptureDevice VCD;
         private string ImagePath;
-        private int Interval = 600;
-        private int Current = 0;
+        private int Interval = 60000;
         private Dictionary<string, string> MonikerMap = new Dictionary<string, string>();
+        //system.timers.timer code
+        private bool GrabImage = true;
+        System.Timers.Timer ImageCaptureTimer;
 
         public Form1()
         {
@@ -47,22 +49,29 @@ namespace WindowsFormsApplication1
             VCD.NewFrame += new NewFrameEventHandler(VCD_NewFrame);
             videoSourcePlayer1.VideoSource = VCD;
             VCD.Start();
+            GrabImage = true;
+            ImageCaptureTimer = new System.Timers.Timer(Interval);
+            ImageCaptureTimer.Elapsed += new System.Timers.ElapsedEventHandler(ImageCaptureTimer_Elapsed);
+            ImageCaptureTimer.Start();
+        }
+
+        void ImageCaptureTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            GrabImage = true;
         }
 
         void VCD_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
-            if (Current % Interval == 0)
+            if (GrabImage)
             {
-                Bitmap image = new Bitmap(eventArgs.Frame);
+                GrabImage = false;
+                Bitmap img = eventArgs.Frame;
                 if (!Directory.Exists(ImagePath))
                     Directory.CreateDirectory(ImagePath);
                 string filename = ImagePath + DateTime.Now.ToString("MMMM_dd_yyyy-HH.mm.ss") + ".jpg"; ;
                 //Console.WriteLine(filename);
-                image.Save(filename, System.Drawing.Imaging.ImageFormat.Jpeg);
-                Current = 0;
+                img.Save(filename, System.Drawing.Imaging.ImageFormat.Jpeg);                
             }
-            Current++;
-            //Console.WriteLine(Current);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -103,13 +112,14 @@ namespace WindowsFormsApplication1
             try
             {
                 VCD.Stop();
+                ImageCaptureTimer.Stop();
             }
             catch { }
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            Interval = (int)numericUpDown1.Value * 600;
+            Interval = (int)numericUpDown1.Value * 60 * 1000;
         }
     }
 }
