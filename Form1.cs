@@ -49,6 +49,7 @@ namespace WindowsFormsApplication1
             VCD.NewFrame += new NewFrameEventHandler(VCD_NewFrame);
             videoSourcePlayer1.VideoSource = VCD;
             VCD.Start();
+
             GrabImage = true;
             ImageCaptureTimer = new System.Timers.Timer(Interval);
             ImageCaptureTimer.Elapsed += new System.Timers.ElapsedEventHandler(ImageCaptureTimer_Elapsed);
