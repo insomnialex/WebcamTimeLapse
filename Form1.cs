@@ -86,6 +86,7 @@ namespace WindowsFormsApplication1
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 textBox1.Text = fbd.SelectedPath;
+                ImagePath = fbd.SelectedPath;
             }
         }
 
