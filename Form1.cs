@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using AForge.Video;
 using AForge.Video.DirectShow;
+using System.Xml.Serialization;
 using System.IO;
 
 namespace WindowsFormsApplication1
@@ -38,6 +39,7 @@ namespace WindowsFormsApplication1
             }
             if(devices.Count > 0)
                 comboBox1.SelectedIndex = 0;
+            LoadConfig();
         }
 
         private void StartCapture() 
@@ -78,6 +80,7 @@ namespace WindowsFormsApplication1
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             StopCapture();
+            SaveConfig();
         }
 
         private void ChooseFolder()
@@ -123,5 +126,45 @@ namespace WindowsFormsApplication1
         {
             Interval = (int)numericUpDown1.Value * 60 * 1000;
         }
+
+        private void SaveConfig() 
+        {
+            try
+            {
+                string exePath = Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location);
+                Config currentConfig = new Config();
+                currentConfig.ImagePath = ImagePath;
+                currentConfig.Interval = Interval / 60000;
+                XmlSerializer xmlConfig = new XmlSerializer(typeof(Config));
+                TextWriter configFile = new StreamWriter(exePath + @"\config");
+                xmlConfig.Serialize(configFile, currentConfig);
+                configFile.Close();
+            }
+            catch { }
+        }
+
+        private void LoadConfig()
+        {
+            try
+            {
+                string exePath = Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location);
+                TextReader configReader = new StreamReader(exePath + @"\config");
+                XmlSerializer xmlConfig = new XmlSerializer(typeof(Config));
+                Config savedConfig = (Config)xmlConfig.Deserialize(configReader);
+                Interval = savedConfig.Interval * 60000;
+                numericUpDown1.Value = savedConfig.Interval;
+                ImagePath = savedConfig.ImagePath;
+                numericUpDown1.Value = savedConfig.Interval;
+                configReader.Close();
+                textBox1.Text = ImagePath;                
+            }
+            catch { }
+        }
+    }
+
+    public class Config 
+    {
+        public string ImagePath;
+        public int Interval;
     }
 }
