@@ -6,3 +6,6 @@ Right now it just counts the number of frames, but i'll change it to use a timer
 
 7-5-2012
 Changed to use a timer instead of counting frames
+
+7-5-2012
+Added auto save to config file for file location and interval
