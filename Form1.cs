@@ -18,6 +18,7 @@ namespace WindowsFormsApplication1
         private VideoCaptureDevice VCD;
         private string ImagePath;
         private int Interval = 60000;
+        private string HomePath = Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location);
         private Dictionary<string, string> MonikerMap = new Dictionary<string, string>();
         //system.timers.timer code
         private bool GrabImage = true;
@@ -25,9 +26,9 @@ namespace WindowsFormsApplication1
 
         public Form1()
         {
-            InitializeComponent();
-            string exePath = Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location);
-            ImagePath = exePath + @"\images\";
+            InitializeComponent();            
+            //default image path
+            ImagePath = HomePath + @"\images\";
             textBox1.Text = ImagePath;            
 
             //load webcam devices
@@ -71,7 +72,7 @@ namespace WindowsFormsApplication1
                 Bitmap img = eventArgs.Frame;
                 if (!Directory.Exists(ImagePath))
                     Directory.CreateDirectory(ImagePath);
-                string filename = ImagePath + DateTime.Now.ToString("MMMM_dd_yyyy-HH.mm.ss") + ".jpg"; ;
+                string filename = ImagePath + "\\" + DateTime.Now.ToString("MMMM_dd_yyyy-HH.mm.ss") + ".jpg"; ;
                 //Console.WriteLine(filename);
                 img.Save(filename, System.Drawing.Imaging.ImageFormat.Jpeg);                
             }
@@ -130,13 +131,12 @@ namespace WindowsFormsApplication1
         private void SaveConfig() 
         {
             try
-            {
-                string exePath = Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location);
+            {                
                 Config currentConfig = new Config();
                 currentConfig.ImagePath = ImagePath;
                 currentConfig.Interval = Interval / 60000;
                 XmlSerializer xmlConfig = new XmlSerializer(typeof(Config));
-                TextWriter configFile = new StreamWriter(exePath + @"\config");
+                TextWriter configFile = new StreamWriter(HomePath + @"\config");
                 xmlConfig.Serialize(configFile, currentConfig);
                 configFile.Close();
             }
@@ -146,9 +146,8 @@ namespace WindowsFormsApplication1
         private void LoadConfig()
         {
             try
-            {
-                string exePath = Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location);
-                TextReader configReader = new StreamReader(exePath + @"\config");
+            {                
+                TextReader configReader = new StreamReader(HomePath + @"\config");
                 XmlSerializer xmlConfig = new XmlSerializer(typeof(Config));
                 Config savedConfig = (Config)xmlConfig.Deserialize(configReader);
                 Interval = savedConfig.Interval * 60000;
