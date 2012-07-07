@@ -87,6 +87,7 @@ namespace WindowsFormsApplication1
         private void ChooseFolder()
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();            
+            fbd.SelectedPath = textBox1.Text;
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 textBox1.Text = fbd.SelectedPath;
